@@ -32,7 +32,7 @@ function Get3DGameDirs(game)
 end
 
 local msvc_flags_compiler = {
-    "/std:c++17",
+    "/std:c++latest",
     "/Ox",
     "/W3",
     "/sdl-",
@@ -48,7 +48,7 @@ local msvc_flags_linker = {
 }
 
 local mingw_flags_compiler = {
-    "-std=c++17",
+    "-std=gnu++23",
     "-O2",
     "-static",
     "-fpermissive",
