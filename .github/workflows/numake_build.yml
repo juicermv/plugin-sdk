@@ -56,6 +56,31 @@ jobs:
       - run: rm -R -Force .numake
         shell: powershell
 
+      - name: Move source code to src
+        shell: powershell
+        run: |
+          mkdir src
+          mv hooking src/hooking
+          mv injector src/injector
+          mv modutils src/modutils
+          mv plugin_II src/plugin_II
+          mv plugin_III src/plugin_III
+          mv plugin_IV src/plugin_IV
+          mv plugin_iii_unreal src/plugin_iii_unreal
+          mv plugin_sa src/plugin_sa
+          mv plugin_sa_unreal src/plugin_sa_unreal
+          mv plugin_vc src/plugin_vc
+          mv plugin_vc_unreal src/plugin_vc_unreal
+          mv safetyhook src/safetyhook
+          mv shared src/shared
+          mv stb src/stb
+
+      - name: Cleanup
+        shell: powershell
+        run: |
+          rm -R -Force .git*
+          rm -R -Force project.lua
+
       - uses: actions/upload-artifact@v4
         with:
           path: .
@@ -82,6 +107,29 @@ jobs:
       - run: mv .numake/out lib
 
       - run: rm -rf .numake
+
+      - name: Move source code to src
+        run: |
+          mkdir src
+          mv hooking src/hooking
+          mv injector src/injector
+          mv modutils src/modutils
+          mv plugin_II src/plugin_II
+          mv plugin_III src/plugin_III
+          mv plugin_IV src/plugin_IV
+          mv plugin_iii_unreal src/plugin_iii_unreal
+          mv plugin_sa src/plugin_sa
+          mv plugin_sa_unreal src/plugin_sa_unreal
+          mv plugin_vc src/plugin_vc
+          mv plugin_vc_unreal src/plugin_vc_unreal
+          mv safetyhook src/safetyhook
+          mv shared src/shared
+          mv stb src/stb
+            
+      - name: Cleanup
+        run: |
+          rm -rf .git*
+          rm -rf project.lua
 
       - uses: actions/upload-artifact@v4
         with:
