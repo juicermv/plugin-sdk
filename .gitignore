@@ -500,3 +500,5 @@ tools/plugin-sdk-funcs-gen/funcs_conv.h
 tools
 .numake
 *.exe
+
+.vscode

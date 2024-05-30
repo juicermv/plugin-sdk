@@ -56,28 +56,42 @@ jobs:
       - run: rm -R -Force .numake
         shell: powershell
 
-      - name: Move source code to src
+      - name: Copy source code to src
         shell: powershell
         run: |
           mkdir src
-          mv hooking src/hooking
-          mv injector src/injector
-          mv modutils src/modutils
-          mv plugin_II src/plugin_II
-          mv plugin_III src/plugin_III
-          mv plugin_IV src/plugin_IV
-          mv plugin_iii_unreal src/plugin_iii_unreal
-          mv plugin_sa src/plugin_sa
-          mv plugin_sa_unreal src/plugin_sa_unreal
-          mv plugin_vc src/plugin_vc
-          mv plugin_vc_unreal src/plugin_vc_unreal
-          mv safetyhook src/safetyhook
-          mv shared src/shared
-          mv stb src/stb
-
+          cp -R hooking src/hooking
+          cp -R injector src/injector
+          cp -R modutils src/modutils
+          cp -R plugin_II src/plugin_II
+          cp -R plugin_III src/plugin_III
+          cp -R plugin_IV src/plugin_IV
+          cp -R plugin_iii_unreal src/plugin_iii_unreal
+          cp -R plugin_sa src/plugin_sa
+          cp -R plugin_sa_unreal src/plugin_sa_unreal
+          cp -R plugin_vc src/plugin_vc
+          cp -R plugin_vc_unreal src/plugin_vc_unreal
+          cp -R safetyhook src/safetyhook
+          cp -R shared src/shared
+          cp -R stb src/stb
+        
       - name: Cleanup
         shell: powershell
         run: |
+          rm -R -Force hooking
+          rm -R -Force injector
+          rm -R -Force modutils
+          rm -R -Force plugin_II
+          rm -R -Force plugin_III
+          rm -R -Force plugin_IV
+          rm -R -Force plugin_iii_unreal
+          rm -R -Force plugin_sa 
+          rm -R -Force plugin_sa_unreal
+          rm -R -Force plugin_vc
+          rm -R -Force plugin_vc_unreal
+          rm -R -Force safetyhook
+          rm -R -Force shared
+          rm -R -Force stb
           rm -R -Force .git*
           rm -R -Force project.lua
 
@@ -108,26 +122,41 @@ jobs:
 
       - run: rm -rf .numake
 
-      - name: Move source code to src
+      - name: Copy source code to src
+        shell: powershell
         run: |
           mkdir src
-          mv hooking src/hooking
-          mv injector src/injector
-          mv modutils src/modutils
-          mv plugin_II src/plugin_II
-          mv plugin_III src/plugin_III
-          mv plugin_IV src/plugin_IV
-          mv plugin_iii_unreal src/plugin_iii_unreal
-          mv plugin_sa src/plugin_sa
-          mv plugin_sa_unreal src/plugin_sa_unreal
-          mv plugin_vc src/plugin_vc
-          mv plugin_vc_unreal src/plugin_vc_unreal
-          mv safetyhook src/safetyhook
-          mv shared src/shared
-          mv stb src/stb
-            
+          cp -r hooking src/hooking
+          cp -r injector src/injector
+          cp -r modutils src/modutils
+          cp -r plugin_II src/plugin_II
+          cp -r plugin_III src/plugin_III
+          cp -r plugin_IV src/plugin_IV
+          cp -r plugin_iii_unreal src/plugin_iii_unreal
+          cp -r plugin_sa src/plugin_sa
+          cp -r plugin_sa_unreal src/plugin_sa_unreal
+          cp -r plugin_vc src/plugin_vc
+          cp -r plugin_vc_unreal src/plugin_vc_unreal
+          cp -r safetyhook src/safetyhook
+          cp -r shared src/shared
+          cp -r stb src/stb
+
       - name: Cleanup
         run: |
+          rm -rf hooking
+          rm -rf injector
+          rm -rf modutils
+          rm -rf plugin_II
+          rm -rf plugin_III
+          rm -rf plugin_IV
+          rm -rf plugin_iii_unreal
+          rm -rf plugin_sa 
+          rm -rf plugin_sa_unreal
+          rm -rf plugin_vc
+          rm -rf plugin_vc_unreal
+          rm -rf safetyhook
+          rm -rf shared
+          rm -rf stb
           rm -rf .git*
           rm -rf project.lua
 
