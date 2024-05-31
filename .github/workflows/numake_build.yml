@@ -123,7 +123,6 @@ jobs:
       - run: rm -rf .numake
 
       - name: Copy source code to src
-        shell: powershell
         run: |
           mkdir src
           cp -r hooking src/hooking
