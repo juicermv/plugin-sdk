@@ -122,17 +122,21 @@ public:
 
     using RegPack = injector::reg_pack;
 
-    static inline std::unordered_map<uint32_t, void(*)(RegPack&)> staticHookMap;
-    static inline int32_t staticHookIndices = 0;
-
     static void StaticHook(uintptr_t start, uintptr_t end, void (*func)(RegPack&)) {
-        staticHookMap[staticHookIndices++] = func;
         struct staticHook {
-            int32_t id = staticHookIndices - 1;
-            void operator()(injector::reg_pack& regs) {
-                staticHookMap[id](regs);
+            void (*func)(RegPack&);
+
+            staticHook(void(*f)(RegPack&)) : func(f) {}
+
+            void operator()(RegPack& regs) {
+                func(regs);
             }
-        }; injector::MakeInline<staticHook>(start, end);
+        };
+
+        static std::unique_ptr<staticHook> ptr;
+        ptr.reset(new staticHook(func));
+
+        injector::MakeInline(start, end, *ptr);
     }
 
     template <typename T>
@@ -142,3 +146,10 @@ public:
 };
 
 }
+
+#define _override(index, classname, func) \
+do {\
+	void** vtable = *reinterpret_cast<void***>(this); \
+    auto _func = &classname::func; \
+    vtable[index] = *reinterpret_cast<void**>(&_func); \
+} while(0)
