@@ -1,3 +1,6 @@
+# Automatically built PluginSDK lib files for MSVC and MinGW
+
+
 <p align="center"><img src="http://i.imgur.com/xFXWiU9.png"></p>
 
 ## English
