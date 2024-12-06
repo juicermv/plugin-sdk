@@ -184,5 +184,5 @@ plugin_vc.files = AddTables(
 )
 
 workspace:register_target(plugin_sa)
-workspace:register_target(plugin_vc)
+-- broken! workspace:register_target(plugin_vc)
 workspace:register_target(plugin_3)
