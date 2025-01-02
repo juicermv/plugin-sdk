@@ -190,3 +190,7 @@ void FlushObrsPrintfs() {
 void DefinedState() {
     plugin::Call<0x526330>();
 }
+
+void* GetD3DDevice() {
+    return *reinterpret_cast<void**>(0x7897A8);
+}

@@ -25,7 +25,7 @@
 namespace plugin {
     void BassSampleManager::LoadSample(std::string const& file, uint32_t loopStart, int32_t loopEnd) {
         BassSample s;
-        s.handle = BASS_SampleLoad(FALSE, file.c_str(), 0, 0, 1, BASS_SAMPLE_3D);
+        s.handle = BASS_SampleLoad(FALSE, file.c_str(), 0, 0, 1, BASS_SAMPLE_MONO | BASS_SAMPLE_3D);
         s.loopStart = loopStart;
         s.loopEnd = loopEnd;
         samples.push_back(s);
@@ -357,7 +357,7 @@ namespace plugin {
                     if (samplesPerFrame == 0)
                         continue;
 
-                    it->framesToPlay = (it->loopCount * GetSampleLength(it->sample)) / samplesPerFrame + 1;
+                    it->framesToPlay = (it->loopCount * GetSampleLength(it->sample)) / samplesPerFrame + 1.0f;
                 }
 
                 auto a = std::find_if(streams.begin(), streams.end(), [&](const BassStream& item) {
@@ -395,10 +395,7 @@ namespace plugin {
                 }
             }
         }
-        queue = {};
-        //queue.erase(std::remove_if(queue.begin(), queue.end(), [](const BassQueue& item) {
-        //    return item.played;
-        //}), queue.end());
+        queue.clear();
     }
 
     uint32_t BassSampleManager::FindAvailableChannel() {
