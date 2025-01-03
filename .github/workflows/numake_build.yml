@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   generate-release-name:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       name: ${{steps.generate.outputs.name}}
 
@@ -170,7 +170,7 @@ jobs:
           compression-level: 9
 
   create-release:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     needs:
