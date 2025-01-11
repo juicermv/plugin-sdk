@@ -1,5 +1,4 @@
 --! NuMake Project
-local inspect = workspace:load_url("https://raw.githubusercontent.com/kikito/inspect.lua/master/inspect.lua") --- For debugging purposes
 
 function AddTables(t1, t2)
     for i = 1, #t2 do
@@ -63,126 +62,180 @@ local mingw_flags_linker = {
     "--gc-sections"
 }
 
-local plugin_sa
-local plugin_3
-local plugin_vc
+local plugin_sa = Project(
+    "plugin_sa",
+    "c++",
+    "plugin.lib",
+    AddTables(
+        filesystem:walk("hooking", false),
+        AddTables(
+            filesystem:walk("shared", true),
+            filesystem:walk("plugin_sa", true)
+        )
+    ),
+    nil,
+    AddTables(Get3DGameDirs("sa"), shared_paths),
+    shared_paths,
+    nil,
+    {
+        "_HAS_CXX17",
+        "_CRT_SECURE_NO_WARNINGS",
+        "_CRT_NON_CONFORMING_SWPRINTFS",
+        "_USE_MATH_DEFINES",
+        "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
+        "_DX9_SDK_INSTALLED",
+        "GTASA",
+        "PLUGIN_SGV_10US",
+        "RW"
+    },
+    msvc_flags_compiler,
+    msvc_flags_linker,
+    nil,
+    nil,
+    "x86",
+    "staticlibrary"
+)
 
-if workspace.platform == "windows" and workspace.arguments["mingw"] ~= "true" then
-    ---! GTASA !---
-    plugin_sa = workspace:create_msvc_target("plugin_sa")
-    plugin_sa.arch = "x86"
-    plugin_sa.compiler_flags = msvc_flags_compiler
-    plugin_sa.linker_flags = msvc_flags_linker
-    plugin_sa.output = "plugin.lib"
+local plugin_3 = Project(
+    "plugin_3",
+    "c++",
+    "plugin_iii.lib",
+    AddTables(
+        filesystem:walk("hooking", false),
+        AddTables(
+            filesystem:walk("shared", true),
+            filesystem:walk("plugin_III", true)
+        )
+    ),
+    nil,
+    AddTables(Get3DGameDirs("III"), shared_paths),
+    shared_paths,
+    nil,
+    {
+        "_HAS_CXX17",
+        "_CRT_SECURE_NO_WARNINGS",
+        "_CRT_NON_CONFORMING_SWPRINTFS",
+        "_USE_MATH_DEFINES",
+        "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
+        "_DX9_SDK_INSTALLED",
+        "GTA3",
+        "PLUGIN_SGV_10EN",
+        "RW"
+    },
+    msvc_flags_compiler,
+    msvc_flags_linker,
+    nil,
+    nil,
+    "x86",
+    "staticlibrary"
+)
 
-    ---! GTA3 !---
-    plugin_3 = workspace:create_msvc_target("plugin_3")
-    plugin_3.arch = "x86"
-    plugin_3.compiler_flags = msvc_flags_compiler
-    plugin_3.linker_flags = msvc_flags_linker
-    plugin_3.output = "plugin_iii.lib"
+local plugin_vc = Project(
+    "plugin_vc",
+    "c++",
+    "plugin_vc.lib",
+    AddTables(
+        filesystem:walk("hooking", false),
+        AddTables(
+            filesystem:walk("shared", true),
+            filesystem:walk("plugin_vc", true)
+        )
+    ),
+    nil,
+    AddTables(Get3DGameDirs("vc"), shared_paths),
+    shared_paths,
+    nil,
+    {
+        "_HAS_CXX17",
+        "_CRT_SECURE_NO_WARNINGS",
+        "_CRT_NON_CONFORMING_SWPRINTFS",
+        "_USE_MATH_DEFINES",
+        "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
+        "_DX9_SDK_INSTALLED",
+        "GTAVC",
+        "PLUGIN_SGV_10EN",
+        "RW"
+    },
+    msvc_flags_compiler,
+    msvc_flags_linker,
+    nil,
+    nil,
+    "x86",
+    "staticlibrary"
+)
 
-    ---! VICE CITY !---
-    plugin_vc = workspace:create_msvc_target("plugin_vc")
-    plugin_vc.arch = "x86"
-    plugin_vc.compiler_flags = msvc_flags_compiler
-    plugin_vc.linker_flags = msvc_flags_linker
-    plugin_vc.output = "plugin_vc.lib"
-else
-    ---! GTASA !---
-    plugin_sa = workspace:create_mingw_target("plugin_sa")
+function MSVC_SA() 
+    msvc:build(plugin_sa)
+end
+
+function MSVC_III() 
+    msvc:build(plugin_3)
+end
+
+function MSVC_VC() 
+    msvc:build(plugin_vc)
+end
+
+function MINGW_SA()
     plugin_sa.arch = "i686"
     plugin_sa.compiler_flags = mingw_flags_compiler
     plugin_sa.linker_flags = mingw_flags_linker
     plugin_sa.output = "libplugin.a"
 
-    ---! GTA3 !---
-    plugin_3 = workspace:create_mingw_target("plugin_3")
+    mingw:build(plugin_sa)
+end
+
+function MINGW_III()
     plugin_3.arch = "i686"
     plugin_3.compiler_flags = mingw_flags_compiler
     plugin_3.linker_flags = mingw_flags_linker
     plugin_3.output = "libplugin_iii.a"
 
-    ---! VICE CITY !---
-    plugin_vc = workspace:create_mingw_target("plugin_vc")
+    mingw:build(plugin_3)
+end
+
+function MINGW_VC()
     plugin_vc.arch = "i686"
     plugin_vc.compiler_flags = mingw_flags_compiler
     plugin_vc.linker_flags = mingw_flags_linker
     plugin_vc.output = "libplugin_vc.a"
+    mingw:build(plugin_vc)
 end
 
---! GTASA !--
-plugin_sa.definitions = {
-    "_HAS_CXX17",
-    "_CRT_SECURE_NO_WARNINGS",
-    "_CRT_NON_CONFORMING_SWPRINTFS",
-    "_USE_MATH_DEFINES",
-    "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
-    "_DX9_SDK_INSTALLED",
-    "GTASA",
-    "PLUGIN_SGV_10US",
-    "RW"
-}
-plugin_sa.static_library = true
-plugin_sa.include_paths = AddTables(Get3DGameDirs("sa"), shared_paths)
-plugin_sa.library_paths = shared_paths
-plugin_sa.resource_files = plugin_rc
-plugin_sa.files = AddTables(
-    workspace:walk_dir("hooking", false, { "cpp" }),
-    AddTables(
-        workspace:walk_dir("shared", true, { "cpp" }),
-        workspace:walk_dir("plugin_sa", true, { "cpp" })
-    )
+tasks:create("msvc_sa", MSVC_SA)
+tasks:create("msvc_iii", MSVC_III)
+tasks:create("msvc_vc", MSVC_VC)
+
+tasks:create("mingw_sa", MINGW_SA)
+tasks:create("mingw_iii", MINGW_III)
+tasks:create("mingw_vc", MINGW_VC)
+
+tasks:create("mingw_all", 
+    function()
+        MINGW_SA()
+        MINGW_III()
+        MINGW_VC()
+    end
 )
 
---! GTA3 !--
-plugin_3.definitions = {
-    "_HAS_CXX17",
-    "_CRT_SECURE_NO_WARNINGS",
-    "_CRT_NON_CONFORMING_SWPRINTFS",
-    "_USE_MATH_DEFINES",
-    "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
-    "_DX9_SDK_INSTALLED",
-    "GTA3",
-    "PLUGIN_SGV_10EN",
-    "RW"
-}
-plugin_3.static_library = true
-plugin_3.include_paths = AddTables(Get3DGameDirs("III"), shared_paths)
-plugin_3.library_paths = shared_paths
-plugin_3.resource_files = plugin_rc
-plugin_3.files = AddTables(
-    workspace:walk_dir("hooking", false, { "cpp" }),
-    AddTables(
-        workspace:walk_dir("shared", true, { "cpp" }),
-        workspace:walk_dir("plugin_III", true, { "cpp" })
-    )
+
+tasks:create("msvc_all", 
+    function()
+        MSVC_SA()
+        MSVC_III()
+        MSVC_VC()
+    end
 )
 
---! VICE CITY !--
-plugin_vc.definitions = {
-    "_HAS_CXX17",
-    "_CRT_SECURE_NO_WARNINGS",
-    "_CRT_NON_CONFORMING_SWPRINTFS",
-    "_USE_MATH_DEFINES",
-    "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
-    "_DX9_SDK_INSTALLED",
-    "GTAVC",
-    "PLUGIN_SGV_10EN",
-    "RW"
-}
-plugin_vc.static_library = true
-plugin_vc.include_paths = AddTables(Get3DGameDirs("vc"), shared_paths)
-plugin_vc.library_paths = shared_paths
-plugin_vc.resource_files = plugin_rc
-plugin_vc.files = AddTables(
-    workspace:walk_dir("hooking", false, { "cpp" }),
-    AddTables(
-        workspace:walk_dir("shared", true, { "cpp" }),
-        workspace:walk_dir("plugin_vc", true, { "cpp" })
-    )
+tasks:create("all", 
+    function()
+        MINGW_SA()
+        MINGW_III()
+        MINGW_VC()
+
+        MSVC_SA()
+        MSVC_III()
+        MSVC_VC()
+    end
 )
 
-workspace:register_target(plugin_sa)
--- broken! workspace:register_target(plugin_vc)
-workspace:register_target(plugin_3)
