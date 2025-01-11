@@ -179,29 +179,31 @@ jobs:
             - build-msvc
 
         steps:
+            - uses: actions/checkout@v4
+
             - uses: actions/download-artifact@v4
               with:
                   name: mingw
-                  path: mingw
+                  path: ${{runner.temp}}/mingw
 
             - name: Archive MinGW build
-              working-directory: ${{github.workspace}}/mingw
-              run: zip -9 -Zb -r ${{github.workspace}}/mingw.zip .
+              working-directory: ${{runner.temp}}/mingw
+              run: zip -9 -Zb -r ${{runner.temp}}/mingw.zip .
 
             - uses: actions/download-artifact@v4
               with:
                   name: msvc
-                  path: msvc
+                  path: ${{runner.temp}}/msvc
 
             - name: Archive MSVC build
-              working-directory: ${{github.workspace}}/msvc
-              run: zip -9 -Zb -r ${{github.workspace}}/msvc.zip .
+              working-directory: ${{runner.temp}}/msvc
+              run: zip -9 -Zb -r ${{runner.temp}}/msvc.zip .
 
             - name: Create release
-              run: gh release create ${{needs.generate-release-name.outputs.name}} --generate-notes --repo juicermv/plugin-sdk
+              run: gh release create ${{needs.generate-release-name.outputs.name}} --generate-notes
 
             - name: Upload MSVC build to release
-              run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{github.workspace}}/msvc.zip
+              run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{runner.temp}}/msvc.zip
 
             - name: Upload MinGW build to release
-              run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{github.workspace}}/mingw.zip
+              run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{runner.temp}}/mingw.zip
