@@ -18,7 +18,7 @@ local shared_paths = {
     "shared/rwd3d9",
 }
 
-local plugin_rc = { "shared/plugin.rc" }
+local filter = {"cpp", "h", "rc"}
 
 function Get3DGameDirs(game)
     return {
@@ -67,10 +67,10 @@ local plugin_sa = Project(
     "c++",
     "plugin.lib",
     AddTables(
-        filesystem:walk("hooking", false),
+        filesystem:walk("hooking", false, filter),
         AddTables(
-            filesystem:walk("shared", true),
-            filesystem:walk("plugin_sa", true)
+            filesystem:walk("shared", true, filter),
+            filesystem:walk("plugin_sa", true, filter)
         )
     ),
     nil,
@@ -101,10 +101,10 @@ local plugin_3 = Project(
     "c++",
     "plugin_iii.lib",
     AddTables(
-        filesystem:walk("hooking", false),
+        filesystem:walk("hooking", false, filter),
         AddTables(
-            filesystem:walk("shared", true),
-            filesystem:walk("plugin_III", true)
+            filesystem:walk("shared", true, filter),
+            filesystem:walk("plugin_III", true, filter)
         )
     ),
     nil,
@@ -135,10 +135,10 @@ local plugin_vc = Project(
     "c++",
     "plugin_vc.lib",
     AddTables(
-        filesystem:walk("hooking", false),
+        filesystem:walk("hooking", false, filter),
         AddTables(
-            filesystem:walk("shared", true),
-            filesystem:walk("plugin_vc", true)
+            filesystem:walk("shared", true, filter),
+            filesystem:walk("plugin_vc", true, filter)
         )
     ),
     nil,
