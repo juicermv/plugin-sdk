@@ -170,15 +170,17 @@ jobs:
                   compression-level: 9
 
     create-release:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-
-        if: ${{ jobs.build-mingw.conclusion == 'success' || jobs.build-msvc.conclusion == 'success' }}
+        if: ${{ jobs.build-mingw.status == 'success' || jobs.build-msvc.status == 'success' }}
         needs:
             - generate-release-name
             - build-mingw
             - build-msvc
+
+        
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        
 
         steps:
             - uses: actions/checkout@v4
