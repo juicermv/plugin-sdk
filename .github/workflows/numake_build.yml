@@ -174,7 +174,7 @@ jobs:
         permissions:
             contents: write
 
-        if: ${{ steps.build-mingw.conclusion == 'success' || steps.build-msvc.conclusion == 'success' }}
+        if: ${{ jobs.build-mingw.conclusion == 'success' || jobs.build-msvc.conclusion == 'success' }}
         needs:
             - generate-release-name
             - build-mingw
