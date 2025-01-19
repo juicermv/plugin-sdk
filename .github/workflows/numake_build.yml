@@ -173,6 +173,8 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
+
+        if: ${{ steps.build-mingw.conclusion == 'success' || steps.build-msvc.conclusion == 'success' }}
         needs:
             - generate-release-name
             - build-mingw
