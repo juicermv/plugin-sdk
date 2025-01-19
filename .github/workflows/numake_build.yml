@@ -45,6 +45,9 @@ jobs:
         runs-on: windows-latest
         needs: generate-release-name
 
+        outputs:
+            RESULT: ${{steps.build.conclusion}}
+
         steps:
             - uses: actions/checkout@v4
 
@@ -52,6 +55,7 @@ jobs:
               run: gh release download indev -R juicermv/numake --dir "${{runner.temp}}"
 
             - name: Build using numake
+              id: build
               run: ${{runner.temp}}/numake.exe build msvc_all -w ${{github.workspace}}
 
             - run: mv numake/out lib
@@ -109,6 +113,10 @@ jobs:
         runs-on: ubuntu-24.04
         needs: generate-release-name
 
+
+        outputs:
+            RESULT: ${{steps.build.conclusion}}
+            
         steps:
             - uses: actions/checkout@v4
 
@@ -120,6 +128,7 @@ jobs:
                   chmod a+x ${{runner.temp}}/numake
 
             - name: Build using numake
+              id: build
               run: ${{runner.temp}}/numake build mingw_all -w ${{github.workspace}}
 
             - run: mv numake/out lib
@@ -170,7 +179,7 @@ jobs:
                   compression-level: 9
 
     create-release:
-        if: ${{ jobs.build-mingw.status == 'success' || jobs.build-msvc.status == 'success' }}
+        if: ${{ needs.build-mingw.outputs.RESULT == 'success' || needs.build-msvc.outputs.RESULT == 'success' }}
         needs:
             - generate-release-name
             - build-mingw
