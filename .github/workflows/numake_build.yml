@@ -179,7 +179,7 @@ jobs:
                   compression-level: 9
 
     create-release:
-        if: ${{ needs.build-mingw.outputs.RESULT == 'success' || needs.build-msvc.outputs.RESULT == 'success' }}
+        if: ${{ always() && (needs.build-mingw.outputs.RESULT == 'success' || needs.build-msvc.outputs.RESULT == 'success') }}
         needs:
             - generate-release-name
             - build-mingw
