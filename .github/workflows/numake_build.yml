@@ -113,10 +113,9 @@ jobs:
         runs-on: ubuntu-24.04
         needs: generate-release-name
 
-
         outputs:
             RESULT: ${{steps.build.conclusion}}
-            
+
         steps:
             - uses: actions/checkout@v4
 
@@ -185,30 +184,32 @@ jobs:
             - build-mingw
             - build-msvc
 
-        
         runs-on: ubuntu-latest
         permissions:
             contents: write
-        
 
         steps:
             - uses: actions/checkout@v4
 
             - uses: actions/download-artifact@v4
+              if: ${{needs.build-mingw.outputs.RESULT == 'success'}}
               with:
                   name: mingw
                   path: ${{runner.temp}}/mingw
 
             - name: Archive MinGW build
+              if: ${{needs.build-mingw.outputs.RESULT == 'success'}}
               working-directory: ${{runner.temp}}/mingw
               run: zip -9 -Zb -r ${{runner.temp}}/mingw.zip .
 
             - uses: actions/download-artifact@v4
+              if: ${{needs.build-msvc.outputs.RESULT == 'success'}}
               with:
                   name: msvc
                   path: ${{runner.temp}}/msvc
 
             - name: Archive MSVC build
+              if: ${{needs.build-msvc.outputs.RESULT == 'success'}}
               working-directory: ${{runner.temp}}/msvc
               run: zip -9 -Zb -r ${{runner.temp}}/msvc.zip .
 
@@ -216,7 +217,9 @@ jobs:
               run: gh release create ${{needs.generate-release-name.outputs.name}} --generate-notes
 
             - name: Upload MSVC build to release
+              if: ${{needs.build-msvc.outputs.RESULT == 'success'}}
               run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{runner.temp}}/msvc.zip
 
             - name: Upload MinGW build to release
+              if: ${{needs.build-mingw.outputs.RESULT == 'success'}}
               run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{runner.temp}}/mingw.zip
