@@ -48,7 +48,7 @@ namespace plugin {
         });
 
         if (it != samples.end())
-            return it._Ptr;
+            return &(*it);
 
         return nullptr;
     }
