@@ -1,0 +1,225 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Build using numake
+
+on:
+    push:
+        branches:
+            - 'main'
+
+    pull_request:
+        branches:
+            - 'main'
+
+    workflow_dispatch:
+
+env:
+    # Path to the solution file relative to the root of the project.
+    SOLUTION_FILE_PATH: plugin.sln
+
+    # Configuration type to build.
+    # You can convert this to a build matrix if you need coverage of multiple configuration types.
+    # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    BUILD_CONFIGURATION: Release
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+    contents: read
+
+jobs:
+    generate-release-name:
+        runs-on: ubuntu-latest
+        outputs:
+            name: ${{steps.generate.outputs.name}}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - id: generate
+              run: echo "name=$(git rev-parse --short HEAD)_$(date +%H-%M)" >> "$GITHUB_OUTPUT"
+
+    build-msvc:
+        runs-on: windows-latest
+        needs: generate-release-name
+
+        outputs:
+            RESULT: ${{steps.build.conclusion}}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Download numake
+              run: gh release download indev -R juicermv/numake --dir "${{runner.temp}}"
+
+            - name: Build using numake
+              id: build
+              run: ${{runner.temp}}/numake.exe build msvc_all -w ${{github.workspace}}
+
+            - run: mv numake/out lib
+              shell: powershell
+
+            - run: rm -R -Force numake
+              shell: powershell
+
+            - name: Copy source code to src
+              shell: powershell
+              run: |
+                  mkdir src
+                  cp -R hooking src/hooking
+                  cp -R injector src/injector
+                  cp -R modutils src/modutils
+                  cp -R plugin_II src/plugin_II
+                  cp -R plugin_III src/plugin_III
+                  cp -R plugin_IV src/plugin_IV
+                  cp -R plugin_iii_unreal src/plugin_iii_unreal
+                  cp -R plugin_sa src/plugin_sa
+                  cp -R plugin_sa_unreal src/plugin_sa_unreal
+                  cp -R plugin_vc src/plugin_vc
+                  cp -R plugin_vc_unreal src/plugin_vc_unreal
+                  cp -R safetyhook src/safetyhook
+                  cp -R shared src/shared
+                  cp -R stb src/stb
+
+            - name: Cleanup
+              shell: powershell
+              run: |
+                  rm -R -Force hooking
+                  rm -R -Force injector
+                  rm -R -Force modutils
+                  rm -R -Force plugin_II
+                  rm -R -Force plugin_III
+                  rm -R -Force plugin_IV
+                  rm -R -Force plugin_iii_unreal
+                  rm -R -Force plugin_sa 
+                  rm -R -Force plugin_sa_unreal
+                  rm -R -Force plugin_vc
+                  rm -R -Force plugin_vc_unreal
+                  rm -R -Force safetyhook
+                  rm -R -Force shared
+                  rm -R -Force stb
+                  rm -R -Force .git*
+                  rm -R -Force project.lua
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  path: .
+                  name: msvc
+                  compression-level: 9
+
+    build-mingw:
+        runs-on: ubuntu-24.04
+        needs: generate-release-name
+
+        outputs:
+            RESULT: ${{steps.build.conclusion}}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - run: 'sudo apt-get install g++-mingw-w64-i686 binutils-mingw-w64-i686'
+
+            - name: Download numake
+              run: |
+                  gh release download indev -R juicermv/numake --dir "${{runner.temp}}"
+                  chmod a+x ${{runner.temp}}/numake
+
+            - name: Build using numake
+              id: build
+              run: ${{runner.temp}}/numake build mingw_all -w ${{github.workspace}}
+
+            - run: mv numake/out lib
+
+            - run: rm -rf numake
+
+            - name: Copy source code to src
+              run: |
+                  mkdir src
+                  cp -r hooking src/hooking
+                  cp -r injector src/injector
+                  cp -r modutils src/modutils
+                  cp -r plugin_II src/plugin_II
+                  cp -r plugin_III src/plugin_III
+                  cp -r plugin_IV src/plugin_IV
+                  cp -r plugin_iii_unreal src/plugin_iii_unreal
+                  cp -r plugin_sa src/plugin_sa
+                  cp -r plugin_sa_unreal src/plugin_sa_unreal
+                  cp -r plugin_vc src/plugin_vc
+                  cp -r plugin_vc_unreal src/plugin_vc_unreal
+                  cp -r safetyhook src/safetyhook
+                  cp -r shared src/shared
+                  cp -r stb src/stb
+
+            - name: Cleanup
+              run: |
+                  rm -rf hooking
+                  rm -rf injector
+                  rm -rf modutils
+                  rm -rf plugin_II
+                  rm -rf plugin_III
+                  rm -rf plugin_IV
+                  rm -rf plugin_iii_unreal
+                  rm -rf plugin_sa 
+                  rm -rf plugin_sa_unreal
+                  rm -rf plugin_vc
+                  rm -rf plugin_vc_unreal
+                  rm -rf safetyhook
+                  rm -rf shared
+                  rm -rf stb
+                  rm -rf .git*
+                  rm -rf project.lua
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  path: .
+                  name: mingw
+                  compression-level: 9
+
+    create-release:
+        if: ${{ always() && (needs.build-mingw.outputs.RESULT == 'success' || needs.build-msvc.outputs.RESULT == 'success') }}
+        needs:
+            - generate-release-name
+            - build-mingw
+            - build-msvc
+
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/download-artifact@v4
+              if: ${{needs.build-mingw.outputs.RESULT == 'success'}}
+              with:
+                  name: mingw
+                  path: ${{runner.temp}}/mingw
+
+            - name: Archive MinGW build
+              if: ${{needs.build-mingw.outputs.RESULT == 'success'}}
+              working-directory: ${{runner.temp}}/mingw
+              run: zip -9 -Zb -r ${{runner.temp}}/mingw.zip .
+
+            - uses: actions/download-artifact@v4
+              if: ${{needs.build-msvc.outputs.RESULT == 'success'}}
+              with:
+                  name: msvc
+                  path: ${{runner.temp}}/msvc
+
+            - name: Archive MSVC build
+              if: ${{needs.build-msvc.outputs.RESULT == 'success'}}
+              working-directory: ${{runner.temp}}/msvc
+              run: zip -9 -Zb -r ${{runner.temp}}/msvc.zip .
+
+            - name: Create release
+              run: gh release create ${{needs.generate-release-name.outputs.name}} --generate-notes
+
+            - name: Upload MSVC build to release
+              if: ${{needs.build-msvc.outputs.RESULT == 'success'}}
+              run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{runner.temp}}/msvc.zip
+
+            - name: Upload MinGW build to release
+              if: ${{needs.build-mingw.outputs.RESULT == 'success'}}
+              run: gh release upload ${{needs.generate-release-name.outputs.name}} ${{runner.temp}}/mingw.zip
