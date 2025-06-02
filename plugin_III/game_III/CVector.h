@@ -14,7 +14,11 @@ class CVector {
 public:
     float x, y, z;
 
-    inline CVector() {}
+    inline CVector() {
+        x = 0.0f;
+        y = 0.0f;
+        z = 0.0f;
+    }
 
     inline CVector(float X, float Y, float Z) {
         x = X; y = Y; z = Z;
@@ -104,7 +108,7 @@ public:
         return x != right.x || y != right.y || z != right.z;
     }
 
-    void Normalise() {
+    CVector Normalise() {
         float sq = MagnitudeSqr();
         if (sq > 0.0f) {
             float invsqrt = 1.0f / std::sqrt(sq);
@@ -114,6 +118,8 @@ public:
         }
         else
             x = 1.0f;
+
+        return *this;
     }
 
     void Normalise2D(void) {
@@ -189,4 +195,8 @@ inline CVector operator*(const RwMatrix& mat, const CVector& vec) {
     return CVector(mat.right.x * vec.x + mat.up.x * vec.y + mat.at.x * vec.z + mat.pos.x,
                    mat.right.y * vec.x + mat.up.y * vec.y + mat.at.y * vec.z + mat.pos.y,
                    mat.right.z * vec.x + mat.up.z * vec.y + mat.at.z * vec.z + mat.pos.z);
+}
+
+inline CVector CrossProduct(const CVector& v1, const CVector& v2) {
+    return CVector(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
 }
