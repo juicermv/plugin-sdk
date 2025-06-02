@@ -6,7 +6,38 @@
 */
 #include "Patch.h"
 
+void plugin::patch::NopRestore(uintptr_t address, bool vp) {
+    if (m_NopBytesMap == nullptr) {
+        m_NopBytesMap = std::make_unique<std::unordered_map<uintptr_t, std::vector<uint8_t>>>();
+    }
+
+    if (m_NopBytesMap->empty())
+        return;
+
+    auto it = m_NopBytesMap->find(address);
+    if (it == m_NopBytesMap->end())
+        return;
+
+    const auto& bytes = it->second;
+    for (size_t i = 0; i < bytes.size(); ++i) {
+        injector::WriteMemory(GetGlobalAddress(address + i), bytes[i], vp);
+    }
+}
+
 void plugin::patch::Nop(uintptr_t address, size_t size, bool vp) {
+    if (m_NopBytesMap == nullptr) {
+        m_NopBytesMap = std::make_unique<std::unordered_map<uintptr_t, std::vector<uint8_t>>>();
+    }
+
+    auto it = m_NopBytesMap->find(address);
+    if (it == m_NopBytesMap->end()) {
+        std::vector<uint8_t> originalBytes;
+        for (size_t i = 0; i < size; ++i) {
+            originalBytes.push_back(injector::ReadMemory<uint8_t>(address + i, vp));
+        }
+        m_NopBytesMap->insert({ address, originalBytes });
+    }
+
     injector::MakeNOP(GetGlobalAddress(address), size, vp);
 }
 

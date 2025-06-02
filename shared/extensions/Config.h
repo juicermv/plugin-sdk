@@ -142,16 +142,21 @@ namespace plugin {
             _usePrecision = false;
             _writeOnly = writeOnly;
 
-            std::string str = (char *)PLUGIN_FILENAME;
+#ifdef UNICODE
+            std::wstring str = PLUGIN_FILENAME;
+            std::size_t dotPosition = str.find_last_of('.');
+            if (dotPosition != std::wstring::npos) {
+                std::wstring res = str.substr(0, dotPosition) + L".ini";
+                open(PLUGIN_PATH(res.c_str()));
+            }
+#else
+            std::string str = PLUGIN_FILENAME;
             std::size_t dotPosition = str.find_last_of('.');
             if (dotPosition != std::string::npos) {
                 std::string res = str.substr(0, dotPosition) + ".ini";
-#ifdef UNICODE
-                open(PLUGIN_PATH((wchar_t *)res.c_str()));
-#else
-                open(PLUGIN_PATH((char *)res.c_str()));
-#endif
+                open(PLUGIN_PATH(res.c_str()));
             }
+#endif
         }
 
         void open(std::string fileName);

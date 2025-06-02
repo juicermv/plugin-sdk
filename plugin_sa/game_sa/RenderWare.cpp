@@ -1265,6 +1265,10 @@ void RwD3D9DeletePixelShader(void) {
     ((void(__cdecl *)(void))0x7FACF0)();
 }
 
+void _rwD3D9SetStreams(const RxD3D9VertexStream* streams, RwBool useOffsets) {
+    return plugin::CallDyn(0x7FA090, streams, useOffsets);
+}
+
 const void* RwD3D9GetCaps(void) {
     return ((const void*(__cdecl *)(void))0x7FAD20)();
 }
@@ -3431,9 +3435,6 @@ RxPipeline* RpMatFXGetD3D9Pipeline(RpMatFXD3D9Pipeline d3d9Pipeline) {
 
 /* skeleton.h */
 
-RsEventStatus RsEventHandler(RsEvent e, void* param) {
-    return plugin::CallAndReturn<RsEventStatus, 0x619B60, RsEvent, void*>(e, param);
-}
 
 /* rpanisot.h */
 

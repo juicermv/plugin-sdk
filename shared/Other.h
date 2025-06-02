@@ -12,6 +12,13 @@
 #include <random>
 #include <limits>
 
+#ifdef _WIN32
+extern "C" {
+    __declspec(dllimport) void* __stdcall GetStdHandle(unsigned long nStdHandle);
+    __declspec(dllimport) int __stdcall AllocConsole();
+}
+#endif
+
 #if defined(GTA3) || defined(GTAVC) || defined(GTASA) || defined(GTAIV)
 #include "CTimer.h"
 #endif
@@ -25,6 +32,17 @@ defined(GTA3_UNREAL) || defined(GTAVC_UNREAL) || defined(GTASA_UNREAL)
 #endif
 
 namespace plugin {
+    static void OpenConsole() {
+#if defined(_WIN32)
+        AllocConsole();
+        FILE* dummy;
+        freopen_s(&dummy, "conin$", "r", stdin);
+        freopen_s(&dummy, "conout$", "w", stdout);
+        freopen_s(&dummy, "conout$", "w", stderr);
+        std::setvbuf(stdout, NULL, _IONBF, 0);
+#endif
+    }
+
     template<typename T = int32_t>
     static T RandomNumberInRange(T min, T max) {
         static_assert(std::is_arithmetic<T>::value, "Type T must be numeric");
@@ -55,7 +73,7 @@ namespace plugin {
     bool CreateImageFromFile(std::string const& path, class Image*& img);
 
 #if _HAS_CXX17
-    std::vector<std::string> GetAllFilesInFolder(std::string const& path, std::string const& ext);
+    std::vector<std::string> GetAllFilesInFolder(std::string const& path, std::string const& ext, bool includePath = false);
 #endif
 
     class FormattingUtils {
@@ -98,13 +116,13 @@ namespace plugin {
 
     static std::wstring ToWString(const std::string& str) {
         std::wstring wstr(str.size(), L'\0');
-        std::mbstowcs(&wstr[0], str.c_str(), str.size());
+        mbstowcs_s(nullptr, wstr.data(), wstr.size() + 1, str.c_str(), str.size());
         return wstr;
     }
 
     static std::string ToString(const std::wstring& wstr) {
         std::string str(wstr.size() * MB_CUR_MAX, '\0');
-        std::wcstombs(&str[0], wstr.c_str(), str.size());
+        wcstombs_s(nullptr, str.data(), str.size() + 1, wstr.c_str(), wstr.size());
         return str;
     }
 
@@ -212,6 +230,17 @@ namespace plugin {
     static bool FileExists(const char* name) {
         struct stat buffer;
         return (stat(name, &buffer) == 0);
+    }
+
+    static uint64_t GetAvailableMemory() {
+        MEMORYSTATUSEX memInfo;
+        memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+        if (GlobalMemoryStatusEx(&memInfo)) {
+            DWORDLONG availableRAM = memInfo.ullAvailPhys / (1024 * 1024);
+            return availableRAM;
+        }
+
+        return 0;
     }
 
     struct CaseInsensitiveUnorderedMap {

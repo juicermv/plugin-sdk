@@ -12,39 +12,72 @@
 #include "CVehicle.h"
 #include "CPed.h"
 #include "CPlayerInfo.h"
+#include "CFont.h"
 #include "CRGBA.h"
 
-struct PLUGIN_API tIntroText
+enum class eUseTextCommandState : char
 {
-    float m_fWidth;
-    float m_fHeight;
-    CRGBA m_Color;
-    bool m_bJustify;
-    bool m_bCenter;
-    bool m_bBackground;
-    bool m_bBackgroundOnlyText;
-    float m_fSize;
-    float m_fCentreSize;
-    CRGBA m_BackgroundColor;
-    bool m_bProportional;
-    bool m_bDisable;
-    bool m_bRightJustify;
-    char __pad;
-    unsigned int m_nFontStyle;
-    float m_fX;
-    float m_fY;
-    wchar_t m_Text[100];
+    DISABLED,
+    DISABLE_NEXT_FRAME,
+    ENABLED_BY_SCRIPT
 };
-VALIDATE_SIZE(tIntroText, 0xF4);
+
+#pragma pack(push,1)
+struct tScriptText
+{
+    // defaults from CTheScripts::Init()
+    float letterWidth = 0.48f;
+    float letterHeight = 1.12f;
+    CRGBA color = { 255, 255, 255, 255 };
+    bool justify = false;
+    bool centered = false;
+    bool withBackground = false;
+    bool backgroundOnly = false;
+    float wrapWidth = 182.0f;
+    float centerWidth = float(RsGlobal.maximumWidth);
+    CRGBA backgroundBoxColor = { 128, 128, 128, 128 };
+    bool proportional = true;
+    bool drawBeforeFade = false;
+    bool rightJustify = false;
+    char _pad = 0;
+    int font = FONT_STANDARD;
+    float xPosition = 0.0f;
+    float yPosition = 0.0f;
+    wchar_t text[100] = { 0 };
+};
+#pragma pack(pop)
+VALIDATE_SIZE(tScriptText, 0xF4);
+
+#pragma pack(push,1)
+struct tScriptRectangle
+{
+    // defaults from CTheScripts::Init()
+    bool isUsed = false;
+    bool drawBeforeFade = false;
+    short spriteIdx = -1;
+    CRect rect;
+    CRGBA color = { 255, 255, 255, 255 };
+};
+#pragma pack(pop)
+VALIDATE_SIZE(tScriptRectangle, 0x18);
+
+
+
 
 class PLUGIN_API CTheScripts {
 public:
     static tScriptParam *ScriptParams; // [32]
     static CRunningScript*& pActiveScripts;
 
-    SUPPORTED_10EN_11EN_STEAM static tIntroText(&IntroTextLines)[48]; // static tIntroText IntroTextLines[48]
     SUPPORTED_10EN_11EN_STEAM static unsigned char(&ScriptSpace)[260512]; // static unsigned char ScriptSpace[260512]
-    SUPPORTED_10EN_11EN_STEAM static short &NumberOfIntroTextLinesThisFrame;
+
+    // script drawing
+    SUPPORTED_10EN_11EN_STEAM static eUseTextCommandState& UseTextCommands;
+    SUPPORTED_10EN_11EN_STEAM static unsigned short& NumberOfIntroTextLinesThisFrame;
+    SUPPORTED_10EN_11EN_STEAM static tScriptText (&IntroTextLines)[48];
+    SUPPORTED_10EN_11EN_STEAM static unsigned short& NumberOfIntroRectanglesThisFrame;
+    SUPPORTED_10EN_11EN_STEAM static tScriptRectangle (&IntroRectangles)[16];
+    SUPPORTED_10EN_11EN_STEAM static CSprite2d (&ScriptSprites)[16];
 
     SUPPORTED_10EN_11EN_STEAM static void CleanUpThisObject(CObject *pObject);
     SUPPORTED_10EN_11EN_STEAM static void CleanUpThisPed(CPed *pPed);
