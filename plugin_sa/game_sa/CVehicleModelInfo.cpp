@@ -12,7 +12,6 @@ RwTexture *&CVehicleModelInfo::ms_pLightsTexture = *(RwTexture **)0xB4E68C;
 RwTexture *&CVehicleModelInfo::ms_pLightsOnTexture = *(RwTexture **)0xB4E690;
 RwTexture *&CVehicleModelInfo::ms_pWhiteTexture = *(RwTexture **)0xB4E3EC;
 RwTexDictionary *&CVehicleModelInfo::ms_pVehicleTxd = *(RwTexDictionary**)0xB4E688;
-
 unsigned char *CVehicleModelInfo::ms_currentCol = (unsigned char *)0xB4E3F0;
 CRGBA *CVehicleModelInfo::ms_vehicleColourTable = (CRGBA *)0xB4E480;
 char *CVehicleModelInfo::ms_compsUsed = (char *)0xB4E478;

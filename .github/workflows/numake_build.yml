@@ -51,12 +51,26 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Restore build cache
+              uses: actions/cache/restore@v4
+              with:
+                path: 'numake'
+                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
+                restore-keys: |
+                  ${{runner.os}}-${{runner.arch}}-build-cache-
+
             - name: Download numake
               run: gh release download indev -R juicermv/numake --dir "${{runner.temp}}"
 
             - name: Build using numake
               id: build
               run: ${{runner.temp}}/numake.exe build msvc_all -w ${{github.workspace}}
+
+            - name: Cache Build Output
+              uses: actions/cache/save@v4
+              with:
+                path: 'numake'
+                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
 
             - run: mv numake/out lib
               shell: powershell
@@ -121,6 +135,14 @@ jobs:
 
             - run: 'sudo apt-get install g++-mingw-w64-i686 binutils-mingw-w64-i686'
 
+            - name: Restore build cache
+              uses: actions/cache/restore@v4
+              with:
+                path: 'numake'
+                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
+                restore-keys: |
+                  ${{runner.os}}-${{runner.arch}}-build-cache-
+
             - name: Download numake
               run: |
                   gh release download indev -R juicermv/numake --dir "${{runner.temp}}"
@@ -129,6 +151,12 @@ jobs:
             - name: Build using numake
               id: build
               run: ${{runner.temp}}/numake build mingw_all -w ${{github.workspace}}
+
+            - name: Cache Build Output
+              uses: actions/cache/save@v4
+              with:
+                path: 'numake'
+                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
 
             - run: mv numake/out lib
 
