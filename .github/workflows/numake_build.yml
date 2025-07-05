@@ -54,10 +54,10 @@ jobs:
             - name: Restore build cache
               uses: actions/cache/restore@v4
               with:
-                path: 'numake'
-                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
-                restore-keys: |
-                  ${{runner.os}}-${{runner.arch}}-build-cache-
+                  path: 'numake_build'
+                  key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake_build/')}}
+                  restore-keys: |
+                      ${{runner.os}}-${{runner.arch}}-build-cache-
 
             - name: Download numake
               run: gh release download indev -R juicermv/numake --dir "${{runner.temp}}"
@@ -69,13 +69,13 @@ jobs:
             - name: Cache Build Output
               uses: actions/cache/save@v4
               with:
-                path: 'numake'
-                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
+                  path: 'numake_build'
+                  key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake_build/')}}
 
-            - run: mv numake/out lib
+            - run: mv numake_build/out lib
               shell: powershell
 
-            - run: rm -R -Force numake
+            - run: rm -R -Force numake_build
               shell: powershell
 
             - name: Copy source code to src
@@ -138,10 +138,10 @@ jobs:
             - name: Restore build cache
               uses: actions/cache/restore@v4
               with:
-                path: 'numake'
-                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
-                restore-keys: |
-                  ${{runner.os}}-${{runner.arch}}-build-cache-
+                  path: 'numake_build'
+                  key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake_build/')}}
+                  restore-keys: |
+                      ${{runner.os}}-${{runner.arch}}-build-cache-
 
             - name: Download numake
               run: |
@@ -155,12 +155,12 @@ jobs:
             - name: Cache Build Output
               uses: actions/cache/save@v4
               with:
-                path: 'numake'
-                key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake/')}}
+                  path: 'numake_build'
+                  key: ${{runner.os}}-${{runner.arch}}-build-cache-${{hashFiles('numake_build/')}}
 
-            - run: mv numake/out lib
+            - run: mv numake_build/out lib
 
-            - run: rm -rf numake
+            - run: rm -rf numake_build
 
             - name: Copy source code to src
               run: |

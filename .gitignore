@@ -503,4 +503,5 @@ tools
 
 .vscode
 
-numake/
+numake
+numake_build/
