@@ -29,7 +29,7 @@
 #include <cstdint>
 #include <cstdio>
 #include "gvm/gvm.hpp"
-#include "..\shared\DynAddress.h"
+#include "../shared/DynAddress.h"
 /*
     The following macros (#define) are relevant on this header:
 

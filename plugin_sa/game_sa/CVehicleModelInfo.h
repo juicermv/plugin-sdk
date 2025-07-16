@@ -144,6 +144,7 @@ public:
 	static RwTexture *&ms_pLightsTexture;
 	// vehiclelightson128 texture
 	static RwTexture *&ms_pLightsOnTexture;
+  
 	// defualt white texture
 	static RwTexture *&ms_pWhiteTexture;
 	
